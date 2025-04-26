@@ -1,0 +1,19 @@
+{
+  "id": "blockboy:pokemon_crystal",
+  "translations": {
+    "en_us": "Pokémon Crystal"
+  },
+  "group": "blockboy:items",
+  "vanillaItem": "minecraft:paper",
+  "itemResource":{
+    "models": {
+      "default": "blockboy:item/cartridge1"
+    }
+  },
+  "properties": {
+    "stackSize": 1
+  },
+  "components": {
+    "blockboy:rom": "pokemon-crystal.gbc"
+  }
+}

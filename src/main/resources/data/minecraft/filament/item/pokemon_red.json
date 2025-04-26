@@ -1,0 +1,19 @@
+{
+  "id": "blockboy:pokemon_red",
+  "translations": {
+    "en_us": "Pokémon Red"
+  },
+  "group": "blockboy:items",
+  "vanillaItem": "minecraft:paper",
+  "itemResource":{
+    "models": {
+      "default": "blockboy:item/cartridge2"
+    }
+  },
+  "properties": {
+    "stackSize": 1
+  },
+  "components": {
+    "blockboy:rom": "pokemonred.gb"
+  }
+}

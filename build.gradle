@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version '1.8-SNAPSHOT'
+    id 'fabric-loom' version '1.10-SNAPSHOT'
     id 'maven-publish'
 }
 
@@ -11,15 +11,17 @@ base {
 }
 
 loom {
-    accessWidenerPath = file("src/main/resources/blockboy.accesswidener")
+    accessWidenerPath = file("src/main/resources/blockboy_arcade.accesswidener")
 }
 
 repositories {
     maven { url "https://maven.nucleoid.xyz/" }
+    maven { url "https://maven.tomalbrc.de/" }
     maven { url "https://maven.maxhenkel.de/repository/public" }
     maven {
         url = "https://api.modrinth.com/maven"
     }
+    mavenLocal()
 }
 
 dependencies {
@@ -31,11 +33,14 @@ dependencies {
     // Fabric API. This is technically optional, but you probably want it anyway.
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-    // map canvas and sgui
-    modImplementation include("eu.pb4:map-canvas-api:${project.mapcanvas_version}")
     modImplementation include("eu.pb4:sgui:${project.sgui_version}")
+    modImplementation ("eu.pb4:polymer-core:${project.polymer_version}")
+    modImplementation ("eu.pb4:polymer-virtual-entity:${project.polymer_version}")
+    modImplementation ("eu.pb4:polymer-resource-pack:${project.polymer_version}")
+    modRuntimeOnly ("eu.pb4:polymer-autohost:${project.polymer_version}")
+    modImplementation ("de.tomalbrc:filament:${project.filament_version}")
 
-    modImplementation include('me.lucko:fabric-permissions-api:0.3.1')
+    modImplementation include('me.lucko:fabric-permissions-api:0.3.3')
 
     implementation include("de.maxhenkel.voicechat:voicechat-api:${voicechat_api_version}")
     modRuntimeOnly "maven.modrinth:simple-voice-chat:fabric-${voicechat_mod_version}"
@@ -54,7 +59,7 @@ processResources {
     }
 }
 
-def targetJavaVersion = 17
+def targetJavaVersion = 21
 tasks.withType(JavaCompile).configureEach {
     // ensure that the encoding is set to UTF-8, no matter what the system default is
     // this fixes some edge cases with special characters not displaying correctly

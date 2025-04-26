@@ -1,23 +1,21 @@
 package eu.rekawek.coffeegb.memory.cart;
 
+import de.tomalbrc.blockboy_arcade.RomWrapper;
 import eu.rekawek.coffeegb.AddressSpace;
 import eu.rekawek.coffeegb.memory.BootRom;
 import eu.rekawek.coffeegb.memory.cart.battery.Battery;
-import eu.rekawek.coffeegb.memory.cart.battery.FileBattery;
+import eu.rekawek.coffeegb.memory.cart.battery.ItemStackBattery;
 import eu.rekawek.coffeegb.memory.cart.type.*;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemStack;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Serializable;
+import java.io.*;
 import java.nio.file.Files;
-import java.util.UUID;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -39,17 +37,7 @@ public class Cartridge implements AddressSpace, Serializable {
     }
 
     public enum GameboyType {
-        AUTOMATIC("Automatic"), FORCE_DMG("Force DMG"), FORCE_CGB("Force GBC");
-
-        private final String label;
-
-        GameboyType(String label) {
-            this.label = label;
-        }
-
-        public String getLabel() {
-            return label;
-        }
+        AUTOMATIC, FORCE_DMG, FORCE_CGB
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(Cartridge.class);
@@ -57,28 +45,26 @@ public class Cartridge implements AddressSpace, Serializable {
     private final MemoryController addressSpace;
 
     private final boolean gbc;
-
     private final String title;
-
     private final Battery battery;
-
     private final boolean useBootstrap;
 
     private int dmgBoostrap;
 
-    private UUID playerUUID;
-
-    public Cartridge(File romFile, ServerPlayer player) throws IOException {
-        this(romFile, player, true, GameboyType.AUTOMATIC, false);
+    public Cartridge(RomWrapper romFile, ItemStack cartridgeItem) throws IOException {
+        this(romFile, cartridgeItem, true, GameboyType.AUTOMATIC, false);
     }
 
-    public Cartridge(File romFile, ServerPlayer player, boolean supportBatterySaves, GameboyType overrideGameboyType, boolean useBootstrap) throws IOException {
-        int[] rom = loadFile(romFile);
+    public Cartridge(RomWrapper romFile, ItemStack cartridgeItem, boolean supportBatterySaves, GameboyType overrideGameboyType, boolean useBootstrap) throws IOException {
+        int[] rom = loadFile(new ByteArrayInputStream(romFile.data()));
         CartridgeType type = CartridgeType.getById(rom[0x0147]);
-        title = getTitle(rom);
-        player.sendSystemMessage(Component.literal("Playing: " + title));
-        playerUUID = player.getUUID();
+        String anyTitle = getTitle(rom);
+        if (anyTitle.isBlank()) {
+            anyTitle = romFile.name();
+        }
+        this.title = anyTitle;
         LOG.debug("Cartridge {}, type: {}", title, type);
+
         GameboyTypeFlag gameboyType = GameboyTypeFlag.getFlag(rom[0x0143]);
         int romBanks = getRomBanks(rom[0x0148]);
         int ramBanks = getRamBanks(rom[0x0149]);
@@ -89,30 +75,30 @@ public class Cartridge implements AddressSpace, Serializable {
         LOG.debug("ROM banks: {}, RAM banks: {}", romBanks, ramBanks);
 
         if (type.isBattery() && supportBatterySaves) {
-            battery = new FileBattery(FilenameUtils.removeExtension(romFile.getName())+ "_" + playerUUID.toString(), 0x2000 * ramBanks);
+            this.battery = new ItemStackBattery(cartridgeItem, 0x2000 * ramBanks);
         } else {
-            battery = Battery.NULL_BATTERY;
+            this.battery = Battery.NULL_BATTERY;
         }
 
         if (type.isMbc1()) {
-            addressSpace = new Mbc1(rom, battery, romBanks, ramBanks);
+            this.addressSpace = new Mbc1(rom, this.battery, romBanks, ramBanks);
         } else if (type.isMbc2()) {
-            addressSpace = new Mbc2(rom, battery);
+            this.addressSpace = new Mbc2(rom, this.battery);
         } else if (type.isMbc3()) {
-            addressSpace = new Mbc3(rom, battery, ramBanks);
+            this.addressSpace = new Mbc3(rom, this.battery, ramBanks);
         } else if (type.isMbc5()) {
-            addressSpace = new Mbc5(rom, battery, ramBanks);
+            this.addressSpace = new Mbc5(rom, this.battery, ramBanks);
         } else {
-            addressSpace = new Rom(rom, type, romBanks, ramBanks);
+            this.addressSpace = new Rom(rom, type, romBanks, ramBanks);
         }
 
-        dmgBoostrap = useBootstrap ? 0 : 1;
+        this.dmgBoostrap = useBootstrap ? 0 : 1;
         if (overrideGameboyType == GameboyType.FORCE_CGB) {
-            gbc = true;
+            this.gbc = true;
         } else if (gameboyType == Cartridge.GameboyTypeFlag.NON_CGB) {
-            gbc = false;
+            this.gbc = false;
         } else { // UNIVERSAL
-            gbc = overrideGameboyType != GameboyType.FORCE_DMG;
+            this.gbc = overrideGameboyType != GameboyType.FORCE_DMG;
         }
         this.useBootstrap = useBootstrap;
     }
@@ -174,6 +160,10 @@ public class Cartridge implements AddressSpace, Serializable {
         addressSpace.flushRam();
     }
 
+    private static int[] loadFile(InputStream file) throws IOException {
+        return load(file, file.available());
+    }
+
     private static int[] loadFile(File file) throws IOException {
         String ext = FilenameUtils.getExtension(file.getName());
         try (InputStream is = Files.newInputStream(file.toPath())) {
@@ -206,64 +196,29 @@ public class Cartridge implements AddressSpace, Serializable {
     }
 
     private static int getRomBanks(int id) {
-        switch (id) {
-            case 0:
-                return 2;
-
-            case 1:
-                return 4;
-
-            case 2:
-                return 8;
-
-            case 3:
-                return 16;
-
-            case 4:
-                return 32;
-
-            case 5:
-                return 64;
-
-            case 6:
-                return 128;
-
-            case 7:
-                return 256;
-
-            case 0x52:
-                return 72;
-
-            case 0x53:
-                return 80;
-
-            case 0x54:
-                return 96;
-
-            default:
-                throw new IllegalArgumentException("Unsupported ROM size: " + Integer.toHexString(id));
-        }
+        return switch (id) {
+            case 0 -> 2;
+            case 1 -> 4;
+            case 2 -> 8;
+            case 3 -> 16;
+            case 4 -> 32;
+            case 5 -> 64;
+            case 6 -> 128;
+            case 7 -> 256;
+            case 0x52 -> 72;
+            case 0x53 -> 80;
+            case 0x54 -> 96;
+            default -> throw new IllegalArgumentException("Unsupported ROM size: " + Integer.toHexString(id));
+        };
     }
 
     private static int getRamBanks(int id) {
-        switch (id) {
-            case 0:
-                return 0;
-
-            case 1:
-                return 1;
-
-            case 2:
-                return 1;
-
-            case 3:
-                return 4;
-
-            case 4:
-                return 16;
-
-            default:
-                throw new IllegalArgumentException("Unsupported RAM size: " + Integer.toHexString(id));
-        }
+        return switch (id) {
+            case 0 -> 0;
+            case 1, 2 -> 1;
+            case 3 -> 4;
+            case 4 -> 16;
+            default -> throw new IllegalArgumentException("Unsupported RAM size: " + Integer.toHexString(id));
+        };
     }
 }

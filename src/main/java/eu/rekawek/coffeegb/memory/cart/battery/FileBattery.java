@@ -1,6 +1,6 @@
 package eu.rekawek.coffeegb.memory.cart.battery;
 
-import de.tomalbrc.blockboy.ModConfig;
+import de.tomalbrc.blockboy_arcade.config.ModConfig;
 import net.fabricmc.loader.api.FabricLoader;
 import org.apache.commons.io.IOUtils;
 

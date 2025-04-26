@@ -1,13 +1,12 @@
 package eu.rekawek.coffeegb.emulator;
 
 import com.mojang.logging.LogUtils;
-import eu.pb4.mapcanvas.api.core.CanvasImage;
-import eu.pb4.mapcanvas.api.utils.CanvasUtils;
 import eu.rekawek.coffeegb.gpu.Display;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import net.minecraft.world.item.component.CustomModelData;
 
-import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferByte;
+import java.util.List;
 
 public class BlockBoyDisplay implements Display, Runnable {
 
@@ -23,7 +22,6 @@ public class BlockBoyDisplay implements Display, Runnable {
 
     private boolean enabled;
 
-
     private volatile boolean doStop;
 
     private volatile boolean isStopped;
@@ -34,7 +32,7 @@ public class BlockBoyDisplay implements Display, Runnable {
 
     private int pos;
 
-    public BlockBoyDisplay(int scale, boolean grayscale) {
+    public BlockBoyDisplay(boolean grayscale) {
         super();
 
         img = new BufferedImage(DISPLAY_WIDTH, DISPLAY_HEIGHT, BufferedImage.TYPE_INT_RGB);
@@ -116,63 +114,13 @@ public class BlockBoyDisplay implements Display, Runnable {
         }
     }
 
-    public CanvasImage render(int width, int height) {
-        Image resizedImage = this.img.getScaledInstance(width, height, Image.SCALE_FAST);
-        BufferedImage resized = convertToBufferedImage(resizedImage);
-        int[][] pixels = convertPixelArray(resized);
-
-        var state = new CanvasImage(width, height);
-
-        for (int i = 0; i < width; i++) {
-            for (int j = 0; j < height; j++) {
-                state.set(i, j, CanvasUtils.findClosestColorARGB(pixels[j][i]));
+    public CustomModelData render(int width, int height) {
+        var list = new ObjectArrayList<Integer>();
+        for (int j = 0; j < height; j++) {
+            for (int i = width-1; i >= 0; i--) {
+                list.add(this.img.getRGB(i, j));
             }
         }
-
-        return state;
-    }
-
-    private static int clamp(int i, int min, int max) {
-        if (min > max)
-            throw new IllegalArgumentException("max value cannot be less than min value");
-        if (i < min)
-            return min;
-        if (i > max)
-            return max;
-        return i;
-    }
-
-    private static int[][] convertPixelArray(BufferedImage image) {
-
-        final byte[] pixels = ((DataBufferByte) image.getRaster().getDataBuffer()).getData();
-        final int width = image.getWidth();
-        final int height = image.getHeight();
-
-        int[][] result = new int[height][width];
-        final int pixelLength = 4;
-        for (int pixel = 0, row = 0, col = 0; pixel + 3 < pixels.length; pixel += pixelLength) {
-            int argb = 0;
-            argb += (((int) pixels[pixel] & 0xff) << 24); // alpha
-            argb += ((int) pixels[pixel + 1] & 0xff); // blue
-            argb += (((int) pixels[pixel + 2] & 0xff) << 8); // green
-            argb += (((int) pixels[pixel + 3] & 0xff) << 16); // red
-            result[row][col] = argb;
-            col++;
-            if (col == width) {
-                col = 0;
-                row++;
-            }
-        }
-
-        return result;
-    }
-
-    private static BufferedImage convertToBufferedImage(Image image) {
-        BufferedImage newImage = new BufferedImage(image.getWidth(null), image.getHeight(null),
-                BufferedImage.TYPE_4BYTE_ABGR);
-        Graphics2D g = newImage.createGraphics();
-        g.drawImage(image, 0, 0, null);
-        g.dispose();
-        return newImage;
+        return new CustomModelData(List.of(), List.of(), List.of(), list);
     }
 }

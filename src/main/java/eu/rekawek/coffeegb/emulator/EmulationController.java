@@ -1,8 +1,9 @@
 package eu.rekawek.coffeegb.emulator;
 
-import de.tomalbrc.blockboy.BlockBoy;
-import de.tomalbrc.blockboy.BlockBoySoundOutput;
-import de.tomalbrc.blockboy.ModConfig;
+import de.tomalbrc.blockboy_arcade.BlockBoyArcade;
+import de.tomalbrc.blockboy_arcade.RomWrapper;
+import de.tomalbrc.blockboy_arcade.voicechat.BlockBoySoundOutput;
+import de.tomalbrc.blockboy_arcade.config.ModConfig;
 import eu.rekawek.coffeegb.CartridgeOptions;
 import eu.rekawek.coffeegb.Gameboy;
 import eu.rekawek.coffeegb.controller.ButtonListener;
@@ -11,19 +12,19 @@ import eu.rekawek.coffeegb.sound.SoundOutput;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 
 public class EmulationController {
-
-
     private final BlockBoyDisplay display;
     private final SoundOutput sound;
 
     private final CartridgeOptions options;
 
-    private final File currentRom;
+    private final RomWrapper currentRom;
 
     private Cartridge cart;
 
@@ -33,7 +34,8 @@ public class EmulationController {
 
     private final Cartridge.GameboyType type;
 
-    private final ServerPlayer player;
+    private ServerPlayer player;
+    private final ItemStack cartridgeItem;
 
     private final StreamSerialEndpoint streamSerial = new StreamSerialEndpoint();
 
@@ -41,12 +43,13 @@ public class EmulationController {
 
     private Player linkedPlayer = null;
 
-    public EmulationController(CartridgeOptions options, File initialRom, ServerPlayer player) {
+    public EmulationController(CartridgeOptions options, RomWrapper initialRom, ServerPlayer player, ItemStack cartridgeItem) {
         this.options = options;
         this.currentRom = initialRom;
 
+        this.cartridgeItem = cartridgeItem;
         this.type = Cartridge.GameboyType.AUTOMATIC;
-        this.display = new BlockBoyDisplay(1, false);
+        this.display = new BlockBoyDisplay(false);
         this.sound = FabricLoader.getInstance().isModLoaded("voicechat") && ModConfig.getInstance().sound ? new BlockBoySoundOutput(player) : SoundOutput.NULL_OUTPUT;
         this.player = player;
     }
@@ -61,8 +64,8 @@ public class EmulationController {
             serialThread.interrupt();
             streamSerial.stop();
 
-            if (linkedPlayer != null && BlockBoy.activeSessions.containsKey(linkedPlayer)) {
-                var controller = BlockBoy.activeSessions.get(linkedPlayer).getController();
+            if (linkedPlayer != null && BlockBoyArcade.ACTIVE_SESSIONS.containsKey(linkedPlayer)) {
+                var controller = BlockBoyArcade.ACTIVE_SESSIONS.get(linkedPlayer).getController();
                 if (controller != null) controller.unlink();
             }
         }
@@ -85,7 +88,7 @@ public class EmulationController {
     public void startEmulation() {
         Cartridge newCart;
         try {
-            newCart = loadRom(currentRom);
+            newCart = loadRom(currentRom, cartridgeItem);
         } catch (IOException e) {
             e.printStackTrace();
             return;
@@ -122,8 +125,16 @@ public class EmulationController {
         sound.stop();
     }
 
-    private Cartridge loadRom(File rom) throws IOException {
-        return new Cartridge(rom, player, options.isSupportBatterySaves(), type, options.isUsingBootstrap());
+    public void pause() {
+        this.gameboy.pause();
+    }
+
+    public void resume() {
+        this.gameboy.resume();
+    }
+
+    private Cartridge loadRom(RomWrapper rom, ItemStack cartridgeItem) throws IOException {
+        return new Cartridge(rom, cartridgeItem, options.isSupportBatterySaves(), type, options.isUsingBootstrap());
     }
 
     public void pressed(ButtonListener.Button button) {
@@ -132,5 +143,9 @@ public class EmulationController {
 
     public void released(ButtonListener.Button button) {
         this.gameboy.releasedButton(button);
+    }
+
+    public void setPlayer(ServerPlayer player) {
+        this.player = player;
     }
 }

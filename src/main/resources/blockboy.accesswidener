@@ -1,3 +1,0 @@
-accessWidener v2 named
-
-accessible method net/minecraft/network/protocol/game/ClientboundSetPassengersPacket <init> (Lnet/minecraft/network/FriendlyByteBuf;)V

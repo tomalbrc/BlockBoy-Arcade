@@ -1,34 +1,35 @@
 {
   "schemaVersion": 1,
-  "id": "blockboy",
+  "id": "blockboy-arcade",
   "version": "${version}",
   "name": "BlockBoy",
-  "description": "Gameboy emulator for your fabric minecraft server!",
+  "description": "Data-driven Gameboy Arcades for your fabric minecraft server!",
   "authors": [
     "tomalbrc"
   ],
   "contact": {
-    "website": "https://github.com/tomalbrc/BlockBoy",
-    "repo": "https://github.com/tomalbrc/BlockBoy"
+    "website": "https://github.com/tomalbrc/BlockBoyArcade",
+    "repo": "https://github.com/tomalbrc/BlockBoyArcade"
   },
   "license": "MIT",
-  "icon": "assets/blockboy/icon.png",
+  "icon": "blockboy-arcade-icon@1024.png",
   "environment": "*",
   "entrypoints": {
     "main": [
-      "de.tomalbrc.blockboy.BlockBoy"
+      "de.tomalbrc.blockboy_arcade.BlockBoyArcade"
     ],
     "voicechat": [
-      "de.tomalbrc.blockboy.SVCPlugin"
+      "de.tomalbrc.blockboy_arcade.voicechat.SVCPlugin"
     ]
   },
   "mixins": [
-    "blockboy.mixins.json"
+    "blockboy-arcade.mixins.json"
   ],
-  "accessWidener": "blockboy.accesswidener",
+  "accessWidener": "blockboy_arcade.accesswidener",
   "depends": {
     "fabricloader": ">=${loader_version}",
     "fabric": "*",
+    "filament": ">=0.17.1",
     "minecraft": ">=${minecraft_version}"
   }
 }

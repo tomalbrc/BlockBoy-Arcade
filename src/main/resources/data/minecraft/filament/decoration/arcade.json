@@ -1,0 +1,35 @@
+{
+  "id": "blockboy:arcade",
+  "group": "blockboy:items",
+  "blockTags": ["shulker_boxes"],
+  "itemResource": {
+    "models": {
+      "default": "blockboy:item/arcade-item",
+      "floor": "blockboy:item/arcade"
+    }
+  },
+  "properties": {
+    "rotate": true,
+    "rotateSmooth": true,
+    "stackSize": 1,
+    "destroyTime": 2,
+    "requiresTool": false
+  },
+  "behaviour": {
+    "blockboy:arcade": {
+      "seatTranslation": [0, 0.4, 0],
+      "screenTranslation": [0, 0.95, -0.775],
+      "screenPitch": -22.5
+    }
+  },
+  "blocks": [
+    {
+      "origin": [0,0,-1],
+      "size": [1,1,2]
+    },
+    {
+      "origin": [0,1,-1],
+      "size": [1,1,1]
+    }
+  ]
+}
