@@ -1,19 +1,20 @@
 {
-  "id": "blockboy:pokemon_crystal",
+  "id": "blockboy:dawnwillcome",
   "translations": {
-    "en_us": "Pokémon Crystal"
+    "en_us": "Dawn Will Come"
   },
   "group": "blockboy:items",
   "vanillaItem": "minecraft:paper",
   "itemResource":{
     "models": {
-      "default": "blockboy:item/cartridge1"
+      "default": "blockboy:item/cartridge2"
     }
   },
   "properties": {
     "stackSize": 1
   },
   "components": {
-    "blockboy:rom": "pokemon-crystal.gbc"
+    "blockboy:rom": "minecraft:dawnwillcome.gb",
+    "rarity": "epic"
   }
 }

@@ -6,8 +6,6 @@ import eu.rekawek.coffeegb.memory.BootRom;
 import eu.rekawek.coffeegb.memory.cart.battery.Battery;
 import eu.rekawek.coffeegb.memory.cart.battery.ItemStackBattery;
 import eu.rekawek.coffeegb.memory.cart.type.*;
-import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;

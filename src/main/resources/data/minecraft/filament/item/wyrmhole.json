@@ -1,7 +1,7 @@
 {
-  "id": "blockboy:gblander",
+  "id": "blockboy:wyrmhole",
   "translations": {
-    "en_us": "GBLander"
+    "en_us": "Wyrmhole"
   },
   "group": "blockboy:items",
   "vanillaItem": "minecraft:paper",
@@ -14,6 +14,7 @@
     "stackSize": 1
   },
   "components": {
-    "blockboy:rom": "gblander.gb"
+    "blockboy:rom": "minecraft:wyrmhole.gb",
+    "rarity": "epic"
   }
 }

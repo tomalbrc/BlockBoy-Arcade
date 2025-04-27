@@ -1,7 +1,7 @@
 {
-  "id": "blockboy:flooder",
+  "id": "blockboy:tobudx",
   "translations": {
-    "en_us": "Flooder"
+    "en_us": "Tobu Tobu Girl Deluxe"
   },
   "group": "blockboy:items",
   "vanillaItem": "minecraft:paper",
@@ -14,7 +14,7 @@
     "stackSize": 1
   },
   "components": {
-    "blockboy:rom": "minecraft:flooder.gb",
+    "blockboy:rom": "minecraft:tobudx.gb",
     "rarity": "epic"
   }
 }

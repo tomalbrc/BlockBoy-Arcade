@@ -12,7 +12,6 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Locale;
 
 public class Assets {
     private static final double PIXEL_SIZE = 16.0/ BlockBoyDisplay.DISPLAY_WIDTH;
@@ -59,7 +58,7 @@ public class Assets {
                 JsonObject faces = new JsonObject();
                 JsonObject upFace = new JsonObject();
                 upFace.addProperty("texture", "#p");
-                var idx = y * BlockBoyDisplay.DISPLAY_WIDTH + x;
+                int idx = y * BlockBoyDisplay.DISPLAY_WIDTH + x;
                 upFace.addProperty("tintindex", idx);
                 upFace.add("uv", createUVArray());
                 faces.add("north", upFace);

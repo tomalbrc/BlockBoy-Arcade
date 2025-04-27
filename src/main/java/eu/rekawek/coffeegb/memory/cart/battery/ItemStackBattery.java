@@ -1,5 +1,6 @@
 package eu.rekawek.coffeegb.memory.cart.battery;
 
+import de.tomalbrc.blockboy_arcade.component.BatterySave;
 import de.tomalbrc.blockboy_arcade.component.BlockBoyComponents;
 import net.minecraft.world.item.ItemStack;
 
@@ -39,27 +40,30 @@ public class ItemStackBattery implements Battery {
 
     @Override
     public void loadRamWithClock(int[] ram, long[] clockData) {
-        if (saveDataStack.isEmpty() || !saveDataStack.has(BlockBoyComponents.BATTERY_SAVE)) {
+        if (saveDataStack.isEmpty() || !saveDataStack.has(BlockBoyComponents.BATTERY_SAVE) || saveDataStack.get(BlockBoyComponents.BATTERY_SAVE).buffer() == null) {
             return;
         }
 
-        byte[] save = saveDataStack.get(BlockBoyComponents.BATTERY_SAVE).array();
+        byte[] save = saveDataStack.get(BlockBoyComponents.BATTERY_SAVE).buffer().array();
 
         int ramSize = ram.length;
         int available = save.length - (save.length % 0x2000);
         int len = Math.min(ramSize, available);
 
         for (int i = 0; i < len; i++) {
-            ram[i] = Byte.toUnsignedInt(save[i]);
+            ram[i] = save[i] & 0xff;
         }
 
         if (clockData != null && save.length > len) {
             int clockBytes = clockData.length * Long.BYTES;
             int availableClock = Math.min(clockBytes, save.length - len);
 
-            ByteBuffer clockBuf = ByteBuffer.wrap(save, len, availableClock).order(ByteOrder.LITTLE_ENDIAN);
-            for (int i = 0; i < clockData.length && clockBuf.remaining() >= Long.BYTES; i++) {
-                clockData[i] = clockBuf.getLong();
+            byte[] byteBuff = new byte[4 * clockData.length];
+            if (availableClock >= 0) System.arraycopy(save, len, byteBuff, 0, availableClock);
+            ByteBuffer clockBuf = ByteBuffer.wrap(byteBuff).order(ByteOrder.LITTLE_ENDIAN);
+            int i = 0;
+            while (clockBuf.hasRemaining()) {
+                clockData[i++] = clockBuf.getInt();
             }
         }
     }
@@ -88,7 +92,7 @@ public class ItemStackBattery implements Battery {
             isClockPresent = false;
         }
 
-        this.saveDataStack.set(BlockBoyComponents.BATTERY_SAVE, ByteBuffer.wrap(fullSave));
+        this.saveDataStack.set(BlockBoyComponents.BATTERY_SAVE, new BatterySave(ByteBuffer.wrap(fullSave)));
 
         isDirty = false;
     }
@@ -104,7 +108,7 @@ public class ItemStackBattery implements Battery {
             int b2 = iterator.hasNext() ? iterator.nextInt() & 0xFF : 0;
             int b3 = iterator.hasNext() ? iterator.nextInt() & 0xFF : 0;
 
-            clockData[i] = ((long)b3 << 24) | ((long)b2 << 16) | ((long)b1 << 8) | b0;
+            clockData[i] = ((long) b3 << 24) | ((long) b2 << 16) | ((long) b1 << 8) | b0;
         }
     }
 

@@ -1,5 +1,6 @@
 package de.tomalbrc.blockboy_arcade;
 
+import de.tomalbrc.filament.decoration.block.entity.DecorationBlockEntity;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import eu.pb4.polymer.virtualentity.api.tracker.DisplayTrackedData;
 import eu.rekawek.coffeegb.CartridgeOptions;
@@ -12,6 +13,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Input;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.CustomModelData;
+import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
 public class EmulatorSession {
@@ -19,20 +21,20 @@ public class EmulatorSession {
     private EmulationController controller;
 
     private ServerPlayer player;
+    private ConsoleInput input = new ConsoleInput();
 
     private final ItemStack screenDataItem;
     private final ItemStack cartridgeItem;
     private final ItemDisplayElement screenElement;
 
-    private Runnable onClose;
-    private Runnable onTick;
+    private final DecorationBlockEntity blockEntity;
 
-    public EmulatorSession(ServerPlayer player, ItemStack screenDataItem, ItemStack cartridgeItem, ItemDisplayElement screenElement) {
+    public EmulatorSession(ServerPlayer player, DecorationBlockEntity blockEntity, ItemStack screenDataItem, ItemStack cartridgeItem, ItemDisplayElement screenElement) {
         this.player = player;
         this.screenDataItem = screenDataItem;
         this.cartridgeItem = cartridgeItem;
         this.screenElement = screenElement;
-        BlockBoyArcade.ACTIVE_SESSIONS.put(player, this);
+        this.blockEntity = blockEntity;
     }
 
     public void setPlayer(ServerPlayer player) {
@@ -41,16 +43,18 @@ public class EmulatorSession {
             this.controller.setPlayer(player);
     }
 
+    public ServerPlayer getPlayer() {
+        return this.player;
+    }
+
     @Nullable
     public EmulationController getController() {
         return controller;
     }
 
-    public void playRom(RomWrapper rom, Runnable onTick, Runnable onClose) {
+    public void playRom(RomWrapper rom) {
         this.controller = new EmulationController(new CartridgeOptions(), rom, player, cartridgeItem);
         this.controller.startEmulation();
-        this.onClose = onClose;
-        this.onTick = onTick;
     }
 
     public void tick() {
@@ -58,14 +62,36 @@ public class EmulatorSession {
         this.draw();
         this.screenElement.getDataTracker().setDirty(DisplayTrackedData.Item.ITEM, true);
         this.screenElement.getHolder().tick();
-        this.onTick.run();
+
+        Level level = this.blockEntity.getLevel();
+        if (level != null && level.getGameTime() % 40 == 0)
+            this.blockEntity.setChanged();
     }
 
     public void stop() {
         if (this.controller != null) {
             this.controller.stopEmulation();
-            this.onClose.run();
             this.controller = null;
+
+            CustomModelData cmd = this.screenDataItem.get(DataComponents.CUSTOM_MODEL_DATA);
+            float darkenFactor = 0.2f;
+            for (int i = 0; i < cmd.colors().size(); i++) {
+                int rgb = cmd.colors().get(i);
+                int red   = (rgb >> 16) & 0xFF;
+                int green = (rgb >>  8) & 0xFF;
+                int blue  = (rgb      ) & 0xFF;
+
+                red   = Math.max(0, Math.min(255, (int)(red   * darkenFactor)));
+                green = Math.max(0, Math.min(255, (int)(green * darkenFactor)));
+                blue  = Math.max(0, Math.min(255, (int)(blue  * darkenFactor)));
+
+                int darkenedRgb = (red << 16) | (green << 8) | (blue);
+
+                cmd.colors().set(i, darkenedRgb);
+            }
+            this.screenDataItem.set(DataComponents.CUSTOM_MODEL_DATA, cmd);
+            this.screenElement.getDataTracker().setDirty(DisplayTrackedData.Item.ITEM, true);
+            this.screenElement.getHolder().tick();
         }
     }
 
@@ -85,75 +111,12 @@ public class EmulatorSession {
         return false;
     }
 
-    ConsoleInput input = new ConsoleInput();
-    static public class ConsoleInput {
-        private boolean pressingA = false;
-        private boolean pressingB = false;
-        private boolean pressingStart = false;
-        private boolean pressingSelect = false;
-
-        public void didPressA() {
-            this.pressingA = true;
-        }
-
-        public void didPressB() {
-            this.pressingB = true;
-        }
-
-        public void didPressStart() {
-            this.pressingStart = true;
-        }
-
-        public void didPressSelect() {
-            this.pressingSelect = true;
-        }
-
-        public boolean isPressingSelect() {
-            if (pressingSelect) {
-                pressingSelect = false;
-                return true;
-            }
-            return false;
-        }
-
-        public boolean isPressingStart() {
-            if (pressingStart) {
-                pressingStart = false;
-                return true;
-            }
-            return false;
-        }
-
-        public boolean isPressingB() {
-            if (pressingB) {
-                pressingB = false;
-                return true;
-            }
-            return false;
-        }
-
-        public boolean isPressingA() {
-            if (pressingA) {
-                pressingA = false;
-                return true;
-            }
-            return false;
-        }
-
-        public int pressedA = -1;
-        public int pressedB = -1;
-        public int pressedStart = -1;
-        public int pressedSelect = -1;
-        public Direction zdirection = Direction.UP;
-        public Direction xdirection = Direction.UP;
-    }
-
     public ConsoleInput getInput() {
         return this.input;
     }
 
     public void onPlayerInput(Input input) {
-        if (controller == null)
+        if (this.controller == null)
             return;
 
         if (input.jump()) this.input.didPressA();
@@ -224,13 +187,9 @@ public class EmulatorSession {
     }
 
     private void draw() {
-        CustomModelData image = null;
-        if (controller == null) {
-            image = CustomModelData.EMPTY;
-        } else {
-            image = controller.getDisplay().render(BlockBoyDisplay.DISPLAY_WIDTH, BlockBoyDisplay.DISPLAY_HEIGHT);
+        if (this.controller != null) {
+            CustomModelData image = this.controller.getDisplay().render(BlockBoyDisplay.DISPLAY_WIDTH, BlockBoyDisplay.DISPLAY_HEIGHT);
+            this.screenDataItem.set(DataComponents.CUSTOM_MODEL_DATA, image);
         }
-
-        this.screenDataItem.set(DataComponents.CUSTOM_MODEL_DATA, image);
     }
 }

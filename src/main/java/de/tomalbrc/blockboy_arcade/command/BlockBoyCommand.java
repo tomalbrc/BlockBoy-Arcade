@@ -8,16 +8,12 @@ import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import de.tomalbrc.blockboy_arcade.BlockBoyArcade;
-import de.tomalbrc.blockboy_arcade.config.ModConfig;
 import me.lucko.fabric.api.permissions.v0.Permissions;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.concurrent.CompletableFuture;
 
 import static net.minecraft.commands.Commands.argument;
@@ -29,8 +25,12 @@ public class BlockBoyCommand {
 
         blockboy.then(literal("link").then(argument("friend", StringArgumentType.word()).suggests(new PlayingPlayerSuggestionProvider()).executes(x -> {
             var player = x.getSource().getPlayer();
-            var name = StringArgumentType.getString(x, "friend");
-            var friend = player.server.getPlayerList().getPlayerByName(name);
+            if (player == null) {
+                x.getSource().sendFailure(Component.literal("Must be ran from a player!"));
+            }
+
+            String name = StringArgumentType.getString(x, "friend");
+            Player friend = player.server.getPlayerList().getPlayerByName(name);
 
             if (friend != null) {
                 var s1 = BlockBoyArcade.ACTIVE_SESSIONS.get(player);
@@ -43,6 +43,7 @@ public class BlockBoyCommand {
                 try {
                     assert s1.getController() != null;
                     assert s2.getController() != null;
+
                     s1.getController().link(s2.getController());
                 } catch (IOException e) {
                     player.sendSystemMessage(Component.literal("Could not connect with " + name));
@@ -55,6 +56,10 @@ public class BlockBoyCommand {
 
         blockboy.then(literal("unlink").then(argument("friend", StringArgumentType.word()).suggests(new PlayingPlayerSuggestionProvider()).executes(x -> {
             var player = x.getSource().getPlayer();
+            if (player == null) {
+                x.getSource().sendFailure(Component.literal("Must be ran from a player!"));
+            }
+
             var name = StringArgumentType.getString(x, "friend");
             var friend = player.server.getPlayerList().getPlayerByName(name);
 
@@ -73,29 +78,6 @@ public class BlockBoyCommand {
         })));
 
         dispatcher.getRoot().addChild(blockboy.build());
-    }
-
-    public static class RomSuggestionProvider implements SuggestionProvider<CommandSourceStack> {
-        @Override
-        public CompletableFuture<Suggestions> getSuggestions(CommandContext<CommandSourceStack> context,
-                                                             SuggestionsBuilder builder) {
-            Path path = FabricLoader.getInstance().getGameDir().resolve(ModConfig.getInstance().romsPath);
-            try {
-                if (!path.toFile().exists())
-                    Files.createDirectories(path); // Create parent directories if they don't exist
-
-                var files = Files.list(path);
-                for (Path filepath : files.toList()) {
-                    var str = filepath.getFileName().toString().toLowerCase();
-                    if (str.endsWith(".gbc") || str.endsWith(".gb"))
-                        builder.suggest(filepath.getFileName().toString());
-                }
-            } catch (IOException e) {
-                BlockBoyArcade.LOGGER.error("Error while suggesting rom: {}", e.getLocalizedMessage());
-            }
-
-            return builder.buildFuture();
-        }
     }
 
     public static class PlayingPlayerSuggestionProvider implements SuggestionProvider<CommandSourceStack> {

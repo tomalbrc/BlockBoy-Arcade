@@ -2,7 +2,6 @@ package de.tomalbrc.blockboy_arcade.config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.annotations.SerializedName;
 import net.fabricmc.loader.api.FabricLoader;
 
 import java.io.FileNotFoundException;
@@ -15,16 +14,12 @@ import java.nio.file.Path;
 public class ModConfig {
     private static final Path CONFIG_FILE_PATH = FabricLoader.getInstance().getConfigDir().resolve("blockboy-arcade.json");
     private static ModConfig instance;
-
     private static final Gson gson = new GsonBuilder()
             .setPrettyPrinting()
             .create();
 
-    // entries
-    public String romsPath = "roms/";
-    public String savesPath = "roms/";
-
     public boolean sound = false;
+    public String dateFormat = "dd.MM yyyy, HH:mm";
 
     // impl
 

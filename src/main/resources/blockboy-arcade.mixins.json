@@ -4,6 +4,7 @@
   "package": "de.tomalbrc.blockboy_arcade.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "ItemStackMixin",
     "ServerGamePacketListenerImplMixin"
   ],
   "injectors": {

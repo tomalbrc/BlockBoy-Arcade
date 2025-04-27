@@ -2,15 +2,13 @@ package eu.rekawek.coffeegb.emulator;
 
 import com.mojang.logging.LogUtils;
 import eu.rekawek.coffeegb.gpu.Display;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
 import net.minecraft.world.item.component.CustomModelData;
 
-import java.awt.image.BufferedImage;
 import java.util.List;
 
 public class BlockBoyDisplay implements Display, Runnable {
-
-    private final BufferedImage img;
+    private final int[] pixels = new int[DISPLAY_WIDTH * DISPLAY_HEIGHT];
 
     public static final int[] COLORS = new int[]{0xe6f8da, 0x99c886, 0x437969, 0x051f2a};
 
@@ -35,10 +33,13 @@ public class BlockBoyDisplay implements Display, Runnable {
     public BlockBoyDisplay(boolean grayscale) {
         super();
 
-        img = new BufferedImage(DISPLAY_WIDTH, DISPLAY_HEIGHT, BufferedImage.TYPE_INT_RGB);
         rgb = new int[DISPLAY_WIDTH * DISPLAY_HEIGHT];
         waitingFrame = new int[rgb.length];
         this.grayscale = grayscale;
+
+        for (int i = 0; i < DISPLAY_WIDTH * DISPLAY_HEIGHT; i++) {
+            pixels[i] = 0;
+        }
     }
 
     @Override
@@ -84,7 +85,12 @@ public class BlockBoyDisplay implements Display, Runnable {
         while (!doStop) {
             synchronized (this) {
                 if (frameIsWaiting) {
-                    img.setRGB(0, 0, DISPLAY_WIDTH, DISPLAY_HEIGHT, waitingFrame, 0, DISPLAY_WIDTH);
+                    for (int y = 0, rowBase = 0; y < DISPLAY_HEIGHT; y++, rowBase += DISPLAY_WIDTH) {
+                        int rowEnd = rowBase + DISPLAY_WIDTH - 1;
+                        for (int x = 0; x < DISPLAY_WIDTH; x++) {
+                            pixels[rowBase + x] = waitingFrame[rowEnd - x];
+                        }
+                    }
                     frameIsWaiting = false;
                 } else {
                     try {
@@ -115,12 +121,6 @@ public class BlockBoyDisplay implements Display, Runnable {
     }
 
     public CustomModelData render(int width, int height) {
-        var list = new ObjectArrayList<Integer>();
-        for (int j = 0; j < height; j++) {
-            for (int i = width-1; i >= 0; i--) {
-                list.add(this.img.getRGB(i, j));
-            }
-        }
-        return new CustomModelData(List.of(), List.of(), List.of(), list);
+        return new CustomModelData(List.of(), List.of(), List.of(), IntArrayList.wrap(this.pixels));
     }
 }

@@ -17,7 +17,7 @@
   },
   "behaviour": {
     "blockboy:arcade": {
-      "seatTranslation": [0, 0.4, 0],
+      "seatTranslation": [0, 0.4, 0.15],
       "screenTranslation": [0, 0.95, -0.775],
       "screenPitch": -22.5
     }

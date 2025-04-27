@@ -2,8 +2,8 @@ package eu.rekawek.coffeegb.emulator;
 
 import de.tomalbrc.blockboy_arcade.BlockBoyArcade;
 import de.tomalbrc.blockboy_arcade.RomWrapper;
-import de.tomalbrc.blockboy_arcade.voicechat.BlockBoySoundOutput;
 import de.tomalbrc.blockboy_arcade.config.ModConfig;
+import de.tomalbrc.blockboy_arcade.voicechat.BlockBoySoundOutput;
 import eu.rekawek.coffeegb.CartridgeOptions;
 import eu.rekawek.coffeegb.Gameboy;
 import eu.rekawek.coffeegb.controller.ButtonListener;
@@ -14,9 +14,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 
 public class EmulationController {
     private final BlockBoyDisplay display;
@@ -41,7 +39,7 @@ public class EmulationController {
 
     private Thread serialThread;
 
-    private Player linkedPlayer = null;
+    private ServerPlayer linkedPlayer = null;
 
     public EmulationController(CartridgeOptions options, RomWrapper initialRom, ServerPlayer player, ItemStack cartridgeItem) {
         this.options = options;

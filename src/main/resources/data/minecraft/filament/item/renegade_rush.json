@@ -1,7 +1,7 @@
 {
-  "id": "blockboy:pokemon_red",
+  "id": "blockboy:renegade_rush",
   "translations": {
-    "en_us": "Pokémon Red"
+    "en_us": "Renegade Rush"
   },
   "group": "blockboy:items",
   "vanillaItem": "minecraft:paper",
@@ -14,6 +14,7 @@
     "stackSize": 1
   },
   "components": {
-    "blockboy:rom": "pokemonred.gb"
+    "blockboy:rom": "minecraft:renegade_rush.gb",
+    "rarity": "epic"
   }
 }
