@@ -5,7 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import eu.pb4.polymer.resourcepack.api.ResourcePackBuilder;
-import eu.rekawek.coffeegb.emulator.BlockBoyDisplay;
+import eu.rekawek.coffeegb_mc.emulator.BlockBoyDisplay;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;

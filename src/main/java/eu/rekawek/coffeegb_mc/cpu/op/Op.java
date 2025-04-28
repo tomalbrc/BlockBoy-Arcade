@@ -1,0 +1,44 @@
+package eu.rekawek.coffeegb_mc.cpu.op;
+
+import eu.rekawek.coffeegb_mc.AddressSpace;
+import eu.rekawek.coffeegb_mc.cpu.InterruptManager;
+import eu.rekawek.coffeegb_mc.cpu.Registers;
+import eu.rekawek.coffeegb_mc.gpu.SpriteBug;
+
+import java.io.Serializable;
+
+public interface Op extends Serializable {
+
+    default boolean readsMemory() {
+        return false;
+    }
+
+    default boolean writesMemory() {
+        return false;
+    }
+
+    default int operandLength() {
+        return 0;
+    }
+
+    default int execute(Registers registers, AddressSpace addressSpace, int[] args, int context) {
+        return context;
+    }
+
+    default void switchInterrupts(InterruptManager interruptManager) {
+    }
+
+    default boolean proceed(Registers registers) {
+        return true;
+    }
+
+    default boolean forceFinishCycle() {
+        return false;
+    }
+
+    default SpriteBug.CorruptionType causesOemBug(Registers registers, int context) {
+        return null;
+    }
+
+    String toString();
+}

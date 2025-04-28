@@ -2,8 +2,8 @@ package de.tomalbrc.blockboy_arcade.voicechat;
 
 import de.maxhenkel.voicechat.api.audiochannel.AudioPlayer;
 import de.maxhenkel.voicechat.api.audiochannel.StaticAudioChannel;
-import eu.rekawek.coffeegb.Gameboy;
-import eu.rekawek.coffeegb.sound.SoundOutput;
+import eu.rekawek.coffeegb_mc.Gameboy;
+import eu.rekawek.coffeegb_mc.sound.SoundOutput;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 
