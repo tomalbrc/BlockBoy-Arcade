@@ -3,10 +3,10 @@ Arcade machines with full gameboy resolution and color support!
 Fully server-side, using polymer!
 [Checkout polymers authost feature](https://polymer.pb4.eu/latest/user/resource-pack-hosting/) to host the resource-pack (in polymer/resourcepack.zip) automagically!
 
-There are not recipes, use `/polymer creative` to see the items or use `/give @s blockboy:arcade`
+There are no recipes, use `/polymer creative` to see the items or use `/give @s blockboy:arcade`
 
 The mods' builtin datapack comes with 6 open source gameboy games:
-- [Regegade Rush](https://quinnp.itch.io/renegade-rush)
+- [Renegade Rush](https://quinnp.itch.io/renegade-rush)
 - [Wyrmhole](https://quinnp.itch.io/wyrmhole)
 - [Postie](https://invertedhat.itch.io/postie)
 - [Dawn Will Come](https://eishiya.itch.io/dawn-will-come)
@@ -17,15 +17,13 @@ The mods' builtin datapack comes with 6 open source gameboy games:
 
 ```json
 {
-  "brightness": 10,
   "dateFormat": "dd.MM yyyy, HH:mm",
   "sound": false
 }
 ```
 
-`brightness`: Brightness of the screen
-`dateFormat`: Date format for rom save data tooltip
-`sound`: Flag to enable sounds for the playing player using simple voice chat
+- `dateFormat`: Date format for rom save data tooltip
+- `sound`: Flag to enable sounds for the playing player using simple voice chat
 
 ## Adding roms / items
 
@@ -60,7 +58,8 @@ Arcade example for filament (data/<namespace>/filament/decoration/<name>.json):
     "blockboy:arcade": {
       "seatTranslation": [0, 0.4, 0],
       "screenTranslation": [0, 0.95, -0.775],
-      "screenPitch": -22.5
+      "screenPitch": -22.5,
+      "brightness": 10
     }
   },
   "blocks": [
@@ -115,6 +114,6 @@ Permissions for Luckperms and friends: `blockboy_arcade.command`, with vanilla p
 
 
 ---
-This project uses code from the [coffee-gb gameboy emulator](https://github.com/trekawek/coffee-gb) and the [Image2Map Mod](https://github.com/Patbox/Image2Map) 
+This project uses code from the [coffee-gb gameboy emulator](https://github.com/trekawek/coffee-gb) and the [Image2Map Mod](https://github.com/Patbox/Image2Map)
 You can find the original licenses in the "licenses" directory.
 My changes are also licensed under the MIT license.
