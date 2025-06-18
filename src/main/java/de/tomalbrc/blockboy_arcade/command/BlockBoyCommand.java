@@ -30,7 +30,7 @@ public class BlockBoyCommand {
             }
 
             String name = StringArgumentType.getString(x, "friend");
-            Player friend = player.server.getPlayerList().getPlayerByName(name);
+            Player friend = player.getServer().getPlayerList().getPlayerByName(name);
 
             if (friend != null) {
                 var s1 = BlockBoyArcade.ACTIVE_SESSIONS.get(player);
@@ -61,7 +61,7 @@ public class BlockBoyCommand {
             }
 
             var name = StringArgumentType.getString(x, "friend");
-            var friend = player.server.getPlayerList().getPlayerByName(name);
+            var friend = player.getServer().getPlayerList().getPlayerByName(name);
 
             if (friend != null) {
                 var s1 = BlockBoyArcade.ACTIVE_SESSIONS.get(player);

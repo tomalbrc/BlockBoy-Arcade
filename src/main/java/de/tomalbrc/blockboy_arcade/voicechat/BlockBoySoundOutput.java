@@ -46,7 +46,7 @@ public class BlockBoySoundOutput implements SoundOutput, Runnable {
     private AudioPlayer audioPlayer;
 
     public BlockBoySoundOutput(ServerPlayer player) {
-        this.level = player.serverLevel();
+        this.level = player.level();
         this.player = player;
     }
 
@@ -99,8 +99,6 @@ public class BlockBoySoundOutput implements SoundOutput, Runnable {
         pos = 0;
         tick = 0;
         doStop = false;
-        while (pos < BUFFER_SIZE && !doStop) {
-        }
 
         while (!doStop) {
             while (pos < BUFFER_SIZE && !doStop) {

@@ -6,20 +6,15 @@ import de.tomalbrc.blockboy_arcade.EmulatorSession;
 import de.tomalbrc.filament.api.behaviour.DecorationBehaviour;
 import de.tomalbrc.filament.decoration.block.entity.DecorationBlockEntity;
 import de.tomalbrc.filament.decoration.holder.DecorationHolder;
+import de.tomalbrc.filament.decoration.holder.FilamentDecorationHolder;
 import de.tomalbrc.filament.decoration.util.SeatEntity;
 import de.tomalbrc.filament.registry.EntityRegistry;
 import de.tomalbrc.filament.util.FilamentConfig;
 import de.tomalbrc.filament.util.Util;
-import eu.pb4.polymer.virtualentity.api.ElementHolder;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import eu.pb4.polymer.virtualentity.api.tracker.DisplayTrackedData;
 import eu.rekawek.coffeegb_mc.emulator.EmulationController;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtOps;
-import net.minecraft.nbt.Tag;
-import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
@@ -32,6 +27,8 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.CustomModelData;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -66,8 +63,8 @@ public class ArcadeBehaviour implements DecorationBehaviour<ArcadeBehaviour.Conf
     }
 
     @Override
-    public ElementHolder createHolder(DecorationBlockEntity blockEntity) {
-        return new DecorationHolder(blockEntity) {
+    public FilamentDecorationHolder createHolder(DecorationBlockEntity blockEntity) {
+        var holder = new DecorationHolder(blockEntity::getItem) {
             @Override
             public void destroy() {
                 super.destroy();
@@ -86,6 +83,10 @@ public class ArcadeBehaviour implements DecorationBehaviour<ArcadeBehaviour.Conf
                 return r;
             }
         };
+
+        holder.addElement(this.screenElement);
+
+        return holder;
     }
 
     @Override
@@ -107,11 +108,6 @@ public class ArcadeBehaviour implements DecorationBehaviour<ArcadeBehaviour.Conf
         transform.scale(0.75f);
         this.screenElement.setOffset(screenTranslation(blockEntity));
         this.screenElement.setTransformation(transform);
-    }
-
-    @Override
-    public void onElementAttach(DecorationBlockEntity blockEntity, ElementHolder holder) {
-        holder.addElement(this.screenElement);
     }
 
     @Override
@@ -148,9 +144,9 @@ public class ArcadeBehaviour implements DecorationBehaviour<ArcadeBehaviour.Conf
     }
 
     public void seatPlayer(DecorationBlockEntity decorationBlockEntity, ServerPlayer player) {
-        this.seatEntity = EntityRegistry.SEAT_ENTITY.create(player.serverLevel(), EntitySpawnReason.TRIGGERED);
+        this.seatEntity = EntityRegistry.SEAT_ENTITY.create(player.level(), EntitySpawnReason.TRIGGERED);
         assert seatEntity != null;
-        this.seatEntity.setPos(seatTranslation(decorationBlockEntity).add(decorationBlockEntity.getDecorationHolder().getPos()));
+        this.seatEntity.setPos(seatTranslation(decorationBlockEntity).add(decorationBlockEntity.getOrCreateHolder().getPos()));
         player.level().addFreshEntity(this.seatEntity);
         player.startRiding(this.seatEntity);
         this.seatEntity.setYRot((decorationBlockEntity.getVisualRotationYInDegrees() - config.seatDirection + (FilamentConfig.getInstance().alternativeBlockPlacement ? 180 : 0)));
@@ -193,19 +189,16 @@ public class ArcadeBehaviour implements DecorationBehaviour<ArcadeBehaviour.Conf
     }
 
     @Override
-    public void read(CompoundTag compoundTag, HolderLookup.Provider provider, DecorationBlockEntity blockEntity) {
+    public void read(ValueInput compoundTag, DecorationBlockEntity blockEntity) {
         if (blockEntity.getOrCreateHolder() != null) {
-            DecorationHolder holder = (DecorationHolder) blockEntity.getDecorationHolder();
+            FilamentDecorationHolder holder = blockEntity.getOrCreateHolder();
             if (holder == null) {
                 return;
             }
 
             if (blockEntity.has(BlockBoyBehaviours.ARCADE)) { // it should 100% have the behaviour but just in case
-                RegistryOps<Tag> registryOps = provider.createSerializationContext(NbtOps.INSTANCE);
-                if (compoundTag.contains("Cartridge"))
-                    this.cartridge = compoundTag.read("Cartridge", ItemStack.CODEC, registryOps).orElse(ItemStack.EMPTY);
-                if (compoundTag.contains("Screen"))
-                    this.screen = compoundTag.read("Screen", ItemStack.CODEC, registryOps).orElse(ItemStack.EMPTY);
+                compoundTag.read("Cartridge", ItemStack.CODEC).ifPresent(x -> this.cartridge = x);
+                compoundTag.read("Screen", ItemStack.CODEC).ifPresent(x -> this.screen = x);
 
                 this.screenElement.setItem(screen);
             }
@@ -213,10 +206,10 @@ public class ArcadeBehaviour implements DecorationBehaviour<ArcadeBehaviour.Conf
     }
 
     @Override
-    public void write(CompoundTag compoundTag, HolderLookup.Provider provider, DecorationBlockEntity blockEntity) {
-        if (blockEntity.getDecorationHolder() != null) {
-            if (!this.cartridge.isEmpty()) compoundTag.put("Cartridge", this.cartridge.save(provider));
-            compoundTag.put("Screen", this.screen.copy().save(provider));
+    public void write(ValueOutput compoundTag, DecorationBlockEntity blockEntity) {
+        if (blockEntity.getOrCreateHolder() != null) {
+            if (!this.cartridge.isEmpty()) compoundTag.store("Cartridge", ItemStack.CODEC, this.cartridge);
+            compoundTag.store("Screen", ItemStack.CODEC, this.screen.copy());
         }
     }
 
