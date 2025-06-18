@@ -8,7 +8,7 @@ import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import de.tomalbrc.blockboy_arcade.BlockBoyArcade;
-import me.lucko.fabric.api.permissions.v0.Permissions;
+import de.tomalbrc.blockboy_arcade.Permissions;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;

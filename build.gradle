@@ -40,8 +40,7 @@ dependencies {
     modRuntimeOnly ("eu.pb4:polymer-autohost:${project.polymer_version}")
     modImplementation ("de.tomalbrc:filament:${project.filament_version}")
 
-    modImplementation include('me.lucko:fabric-permissions-api:0.3.3')
-
+    modCompileOnly("net.luckperms:api:5.4")
     implementation include("de.maxhenkel.voicechat:voicechat-api:${voicechat_api_version}")
     //modRuntimeOnly "maven.modrinth:simple-voice-chat:fabric-${voicechat_mod_version}"
 }

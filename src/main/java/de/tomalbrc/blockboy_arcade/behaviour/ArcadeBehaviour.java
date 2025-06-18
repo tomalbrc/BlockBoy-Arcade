@@ -9,6 +9,7 @@ import de.tomalbrc.filament.decoration.holder.DecorationHolder;
 import de.tomalbrc.filament.decoration.holder.FilamentDecorationHolder;
 import de.tomalbrc.filament.decoration.util.SeatEntity;
 import de.tomalbrc.filament.registry.EntityRegistry;
+import de.tomalbrc.filament.util.DecorationUtil;
 import de.tomalbrc.filament.util.FilamentConfig;
 import de.tomalbrc.filament.util.Util;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
@@ -85,6 +86,8 @@ public class ArcadeBehaviour implements DecorationBehaviour<ArcadeBehaviour.Conf
         };
 
         holder.addElement(this.screenElement);
+
+        DecorationUtil.setupElements(holder, this.blockEntity.getDecorationData(), this.blockEntity.getDirection(), blockEntity.getVisualRotationYInDegrees(), this.blockEntity.visualItemStack(this.blockEntity.getBlockState()), blockEntity::interact);
 
         return holder;
     }
