@@ -24,7 +24,7 @@ public class EmulatorSession {
     private ConsoleInput input = new ConsoleInput();
 
     private final ItemStack screenDataItem;
-    private final ItemStack cartridgeItem;
+    private ItemStack cartridgeItem;
     private final ItemDisplayElement screenElement;
 
     private final DecorationBlockEntity blockEntity;
@@ -41,6 +41,10 @@ public class EmulatorSession {
         this.player = player;
         if (this.controller != null)
             this.controller.setPlayer(player);
+    }
+
+    public void setCartridgeItem(ItemStack cartridgeItem) {
+        this.cartridgeItem = cartridgeItem;
     }
 
     public ServerPlayer getPlayer() {
