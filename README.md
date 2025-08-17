@@ -18,12 +18,14 @@ The mods' builtin datapack comes with 6 open source gameboy games:
 ```json
 {
   "dateFormat": "dd.MM yyyy, HH:mm",
-  "sound": false
+  "sound": false,
+  "ensureNoOppositeDirection": true
 }
 ```
 
 - `dateFormat`: Date format for rom save data tooltip
 - `sound`: Flag to enable sounds for the playing player using simple voice chat
+- `ensureNoOppositeDirection`: Flag to ensure that the player can't press the opposite direction of what he's currently pressing (this behavior is disabled by default as it's not possible with the original hardware. ROMs that are designed to run on emulators might require it)
 
 ## Adding roms / items
 

@@ -20,6 +20,7 @@ public class ModConfig {
 
     public boolean sound = false;
     public String dateFormat = "dd.MM yyyy, HH:mm";
+    public boolean ensureNoOppositeDirection = true;
 
     // impl
 
