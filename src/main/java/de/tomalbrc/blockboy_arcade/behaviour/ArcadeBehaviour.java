@@ -63,6 +63,14 @@ public class ArcadeBehaviour implements DecorationBehaviour<ArcadeBehaviour.Conf
         this.screenElement.setItem(screen);
     }
 
+    public void setCartridge(@NotNull ItemStack cartridge) {
+        this.cartridge = cartridge;
+
+        if (this.session != null)
+        {
+            this.session.setCartridgeItem(cartridge);
+        }
+    }
     @Override
     public FilamentDecorationHolder createHolder(DecorationBlockEntity blockEntity) {
         var holder = new DecorationHolder(blockEntity::getItem) {

@@ -1,5 +1,6 @@
 package de.tomalbrc.blockboy_arcade;
 
+import de.tomalbrc.blockboy_arcade.config.ModConfig;
 import de.tomalbrc.filament.decoration.block.entity.DecorationBlockEntity;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import eu.pb4.polymer.virtualentity.api.tracker.DisplayTrackedData;
@@ -24,7 +25,7 @@ public class EmulatorSession {
     private ConsoleInput input = new ConsoleInput();
 
     private final ItemStack screenDataItem;
-    private final ItemStack cartridgeItem;
+    private ItemStack cartridgeItem;
     private final ItemDisplayElement screenElement;
 
     private final DecorationBlockEntity blockEntity;
@@ -41,6 +42,10 @@ public class EmulatorSession {
         this.player = player;
         if (this.controller != null)
             this.controller.setPlayer(player);
+    }
+
+    public void setCartridgeItem(ItemStack cartridgeItem) {
+        this.cartridgeItem = cartridgeItem;
     }
 
     public ServerPlayer getPlayer() {
@@ -153,7 +158,9 @@ public class EmulatorSession {
             this.input.pressedSelect = -1;
         } else this.input.pressedSelect--;
 
-        if (input.forward()) {
+        boolean ensureNoOppositeDirection = ModConfig.getInstance().ensureNoOppositeDirection;
+
+        if (input.forward() && (!ensureNoOppositeDirection || !input.backward())) {
             this.input.zdirection = Direction.NORTH;
             this.controller.pressed(ButtonListener.Button.UP);
         } else if (this.input.zdirection == Direction.NORTH) {
@@ -161,7 +168,7 @@ public class EmulatorSession {
             this.input.zdirection = Direction.UP; // abuse up as noop, only use n,e,s,w
         }
 
-        if (input.backward()) {
+        if (input.backward() && (!ensureNoOppositeDirection || !input.forward())) {
             this.input.zdirection = Direction.SOUTH;
             this.controller.pressed(ButtonListener.Button.DOWN);
         } else if (this.input.zdirection == Direction.SOUTH) {
@@ -169,7 +176,7 @@ public class EmulatorSession {
             this.input.zdirection = Direction.UP; // abuse up as noop, only use n,e,s,w
         }
 
-        if (input.right()) {
+        if (input.right() && (!ensureNoOppositeDirection || !input.left())) {
             this.input.xdirection = Direction.EAST;
             this.controller.pressed(ButtonListener.Button.RIGHT);
         } else if (this.input.xdirection == Direction.EAST) {
@@ -177,7 +184,7 @@ public class EmulatorSession {
             this.input.xdirection = Direction.UP; // abuse up as noop, only use n,e,s,w
         }
 
-        if (input.left()) {
+        if (input.left() && (!ensureNoOppositeDirection || !input.right())) {
             this.input.xdirection = Direction.WEST;
             this.controller.pressed(ButtonListener.Button.LEFT);
         } else if (this.input.xdirection == Direction.WEST) {

@@ -53,7 +53,8 @@ public class Gui extends SimpleGui {
         this.setSlot(4, new GuiElementBuilder(Items.GREEN_CONCRETE).setItemName(Component.literal("Turn On")).setCallback(() -> {
             ItemStack item = this.getContainer().getItem(0);
             if (item.has(BlockBoyComponents.ROM)) {
-                this.arcadeBehaviour.play(this.getContainer().getItem(0).get(BlockBoyComponents.ROM));
+                this.arcadeBehaviour.setCartridge(item);
+                this.arcadeBehaviour.play(item.get(BlockBoyComponents.ROM));
                 this.close();
             }
         }));
