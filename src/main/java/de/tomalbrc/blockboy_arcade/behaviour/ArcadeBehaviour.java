@@ -42,7 +42,7 @@ public class ArcadeBehaviour implements DecorationBehaviour<ArcadeBehaviour.Conf
     private SeatEntity seatEntity;
 
     @NotNull
-    final private ItemDisplayElement screenElement = new ItemDisplayElement();
+    final private ScreenItemElement screenElement = new ScreenItemElement();
     @NotNull
     private ItemStack screen = Items.PAPER.getDefaultInstance();
     @NotNull
@@ -60,7 +60,7 @@ public class ArcadeBehaviour implements DecorationBehaviour<ArcadeBehaviour.Conf
         this.screen.set(DataComponents.CUSTOM_MODEL_DATA, CustomModelData.EMPTY);
         this.screenElement.setViewRange(0.0245f);
         this.screenElement.setBrightness( new Brightness(config.brightness, config.brightness));
-        this.screenElement.setItem(screen);
+        this.screenElement.setItemReal(screen);
     }
 
     public void setCartridge(@NotNull ItemStack cartridge) {
@@ -306,5 +306,20 @@ public class ArcadeBehaviour implements DecorationBehaviour<ArcadeBehaviour.Conf
         public float screenYaw;
         public float screenPitch;
         public int brightness = 10;
+    }
+
+    private static class ScreenItemElement extends ItemDisplayElement {
+        public ScreenItemElement() {
+            super();
+        }
+        public ScreenItemElement(ItemStack itemStack) {
+            super(itemStack);
+            setItemReal(itemStack);
+        }
+        @Override
+        public void setItem(ItemStack stack) {}
+        public void setItemReal(ItemStack stack) {
+            this.dataTracker.set(DisplayTrackedData.Item.ITEM, stack, true);
+        }
     }
 }
