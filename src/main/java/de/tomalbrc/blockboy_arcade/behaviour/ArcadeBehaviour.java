@@ -211,7 +211,7 @@ public class ArcadeBehaviour implements DecorationBehaviour<ArcadeBehaviour.Conf
                 compoundTag.read("Cartridge", ItemStack.CODEC).ifPresent(x -> this.cartridge = x);
                 compoundTag.read("Screen", ItemStack.CODEC).ifPresent(x -> this.screen = x);
 
-                this.screenElement.setItem(screen);
+                this.screenElement.setItemReal(screen);
             }
         }
     }
