@@ -4,16 +4,16 @@ import eu.pb4.polymer.core.api.other.PolymerComponent;
 import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class BlockBoyComponents {
-    public static final DataComponentType<ResourceLocation> ROM = register(
-            ResourceLocation.fromNamespaceAndPath("blockboy", "rom"),
-            builder -> builder.persistent(ResourceLocation.CODEC)
+    public static final DataComponentType<Identifier> ROM = register(
+            Identifier.fromNamespaceAndPath("blockboy", "rom"),
+            builder -> builder.persistent(Identifier.CODEC)
     );
 
     public static final DataComponentType<BatterySave> BATTERY_SAVE = register(
-            ResourceLocation.fromNamespaceAndPath("blockboy", "battery_save"),
+            Identifier.fromNamespaceAndPath("blockboy", "battery_save"),
             builder -> builder.persistent(BatterySave.CODEC)
     );
 
@@ -21,7 +21,7 @@ public class BlockBoyComponents {
 
     }
 
-    private static <T> DataComponentType<T> register(ResourceLocation name, java.util.function.Function<DataComponentType.Builder<T>, DataComponentType.Builder<T>> builder) {
+    private static <T> DataComponentType<T> register(Identifier name, java.util.function.Function<DataComponentType.Builder<T>, DataComponentType.Builder<T>> builder) {
         var component = Registry.register(
                 BuiltInRegistries.DATA_COMPONENT_TYPE,
                 name,

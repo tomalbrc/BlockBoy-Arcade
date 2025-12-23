@@ -11,7 +11,7 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -21,7 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class BlockBoyArcade implements ModInitializer {
     public static Map<ServerPlayer, ArcadeBehaviour> ACTIVE_SESSIONS = new ConcurrentHashMap<>();
-    public static Map<ResourceLocation, RomWrapper> ROMS = new Object2ObjectArrayMap<>();
+    public static Map<Identifier, RomWrapper> ROMS = new Object2ObjectArrayMap<>();
     public static final Logger LOGGER = LogManager.getLogger("blockboy-arcade");
 
     @Override

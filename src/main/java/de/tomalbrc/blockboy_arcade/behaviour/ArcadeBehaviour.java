@@ -16,7 +16,7 @@ import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
 import eu.pb4.polymer.virtualentity.api.tracker.DisplayTrackedData;
 import eu.rekawek.coffeegb_mc.emulator.EmulationController;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.util.Brightness;
@@ -56,7 +56,7 @@ public class ArcadeBehaviour implements DecorationBehaviour<ArcadeBehaviour.Conf
     public ArcadeBehaviour(Config config) {
         this.config = config;
 
-        this.screen.set(DataComponents.ITEM_MODEL, ResourceLocation.fromNamespaceAndPath("blockboy", "screen"));
+        this.screen.set(DataComponents.ITEM_MODEL, Identifier.fromNamespaceAndPath("blockboy", "screen"));
         this.screen.set(DataComponents.CUSTOM_MODEL_DATA, CustomModelData.EMPTY);
         this.screenElement.setViewRange(0.0245f);
         this.screenElement.setBrightness( new Brightness(config.brightness, config.brightness));
@@ -278,7 +278,7 @@ public class ArcadeBehaviour implements DecorationBehaviour<ArcadeBehaviour.Conf
         return this.cartridge;
     }
 
-    public void play(ResourceLocation id) {
+    public void play(Identifier id) {
         if (this.session != null)
             this.session.playRom(BlockBoyArcade.ROMS.get(id));
     }

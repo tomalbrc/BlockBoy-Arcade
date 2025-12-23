@@ -2,7 +2,7 @@ package de.tomalbrc.blockboy_arcade;
 
 import de.tomalbrc.filament.registry.ModelRegistry;
 import de.tomalbrc.filament.util.FilamentSynchronousResourceReloadListener;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import org.jetbrains.annotations.NotNull;
@@ -15,8 +15,8 @@ import java.util.function.BiConsumer;
 
 public class RomDataReloadListener implements FilamentSynchronousResourceReloadListener {
     @Override
-    public ResourceLocation getFabricId() {
-        return ResourceLocation.fromNamespaceAndPath("blockboy", "roms");
+    public Identifier getFabricId() {
+        return Identifier.fromNamespaceAndPath("blockboy", "roms");
     }
 
     @Override
@@ -34,19 +34,19 @@ public class RomDataReloadListener implements FilamentSynchronousResourceReloadL
         });
     }
 
-    public static ResourceLocation sanitize(ResourceLocation resourceLocation) {
+    public static Identifier sanitize(Identifier resourceLocation) {
         String path = resourceLocation.getPath();
         String customPath = path.substring(path.contains("/") ? path.lastIndexOf('/')+1 : 0);
-        return ResourceLocation.fromNamespaceAndPath(resourceLocation.getNamespace(), customPath);
+        return Identifier.fromNamespaceAndPath(resourceLocation.getNamespace(), customPath);
     }
 
-    public void loadRom(@NotNull String root, @Nullable String endsWith, @NotNull ResourceManager resourceManager, @NotNull BiConsumer<ResourceLocation, InputStream> onRead) {
-        Map<ResourceLocation, Resource> resources = resourceManager.listResources(root, (path) -> path.getPath().contains(".gb"));
-        for(Map.Entry<ResourceLocation, Resource> entry : resources.entrySet()) {
+    public void loadRom(@NotNull String root, @Nullable String endsWith, @NotNull ResourceManager resourceManager, @NotNull BiConsumer<Identifier, InputStream> onRead) {
+        Map<Identifier, Resource> resources = resourceManager.listResources(root, (path) -> path.getPath().contains(".gb"));
+        for(Map.Entry<Identifier, Resource> entry : resources.entrySet()) {
             try (InputStream inputStream = entry.getValue().open()) {
                 onRead.accept(entry.getKey(), inputStream);
             } catch (IllegalStateException | IOException e) {
-                this.error(entry.getKey(), e);
+                FilamentSynchronousResourceReloadListener.error(entry.getKey(), e);
             }
         }
     }
