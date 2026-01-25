@@ -16,34 +16,34 @@ public abstract class ServerGamePacketListenerImplMixin {
     @Shadow
     public ServerPlayer player;
 
+    @Inject(method = "handlePlayerAction", at = @At("HEAD"), cancellable = true)
+    private void blockboy$handlePlayerAction(ServerboundPlayerActionPacket packet, CallbackInfo ci) {
+        if (!BlockBoyArcade.ACTIVE_SESSIONS.containsKey(player)) return;
+
+        var input = BlockBoyArcade.ACTIVE_SESSIONS.get(player).getInput();
+
+        switch (packet.getAction()) {
+            case START_DESTROY_BLOCK -> {
+                input.didPressB();
+                ci.cancel();
+            }
+
+            case DROP_ITEM, DROP_ALL_ITEMS -> {
+                input.didPressSelect();
+                ci.cancel();
+            }
+
+            case SWAP_ITEM_WITH_OFFHAND -> {
+                input.didPressStart();
+                ci.cancel();
+            }
+        }
+    }
+
     @Inject(method = "onDisconnect", at = @At("HEAD"))
     private void blockboy$handleDisconnect(DisconnectionDetails disconnectionDetails, CallbackInfo ci) {
         if (BlockBoyArcade.ACTIVE_SESSIONS.containsKey(player)) {
             BlockBoyArcade.ACTIVE_SESSIONS.get(player).clearSession();
-        }
-    }
-
-    @Inject(method = "handlePlayerAction", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayerGameMode;handleBlockBreakAction(Lnet/minecraft/core/BlockPos;Lnet/minecraft/network/protocol/game/ServerboundPlayerActionPacket$Action;Lnet/minecraft/core/Direction;II)V"), cancellable = true)
-    private void blockboy$handleBreakAction(ServerboundPlayerActionPacket serverboundPlayerActionPacket, CallbackInfo ci) {
-        if (BlockBoyArcade.ACTIVE_SESSIONS.containsKey(player)) {
-            BlockBoyArcade.ACTIVE_SESSIONS.get(player).getInput().didPressB();
-            ci.cancel();
-        }
-    }
-
-    @Inject(method = "handlePlayerAction", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;isSpectator()Z", ordinal = 1), cancellable = true)
-    private void blockboy$handleDrop(ServerboundPlayerActionPacket serverboundPlayerActionPacket, CallbackInfo ci) {
-        if (BlockBoyArcade.ACTIVE_SESSIONS.containsKey(this.player)) {
-            BlockBoyArcade.ACTIVE_SESSIONS.get(player).getInput().didPressSelect();
-            ci.cancel();
-        }
-    }
-
-    @Inject(method = "handlePlayerAction", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;isSpectator()Z", ordinal = 0), cancellable = true)
-    private void blockboy$handleSwap(ServerboundPlayerActionPacket serverboundPlayerActionPacket, CallbackInfo ci) {
-        if (BlockBoyArcade.ACTIVE_SESSIONS.containsKey(this.player)) {
-            BlockBoyArcade.ACTIVE_SESSIONS.get(player).getInput().didPressStart();
-            ci.cancel();
         }
     }
 }
