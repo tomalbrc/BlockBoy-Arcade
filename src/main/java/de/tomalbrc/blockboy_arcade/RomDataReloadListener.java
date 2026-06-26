@@ -1,12 +1,13 @@
 package de.tomalbrc.blockboy_arcade;
 
 import de.tomalbrc.filament.registry.ModelRegistry;
-import de.tomalbrc.filament.util.FilamentSynchronousResourceReloadListener;
+import de.tomalbrc.filament.util.resource.FilamentSynchronousResourceReloadListener;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,12 +16,12 @@ import java.util.function.BiConsumer;
 
 public class RomDataReloadListener implements FilamentSynchronousResourceReloadListener {
     @Override
-    public Identifier getFabricId() {
+    public @NonNull Identifier getFabricId() {
         return Identifier.fromNamespaceAndPath("blockboy", "roms");
     }
 
     @Override
-    public void onResourceManagerReload(ResourceManager resourceManager) {
+    public void onResourceManagerReload(@NonNull ResourceManager resourceManager) {
         loadRom("blockboy", "", resourceManager, (id, inputStream) -> {
             try {
                 var newId = sanitize(id);

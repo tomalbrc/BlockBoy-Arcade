@@ -28,8 +28,8 @@
   "accessWidener": "blockboy_arcade.accesswidener",
   "depends": {
     "fabricloader": ">=${loader_version}",
-    "fabric": "*",
-    "filament": ">=0.17.1",
+    "fabric-api": "*",
+    "filament": ">=1.4.4",
     "minecraft": ">=${minecraft_version}"
   }
 }

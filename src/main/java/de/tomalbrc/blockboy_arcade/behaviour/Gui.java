@@ -14,6 +14,7 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import org.jspecify.annotations.NonNull;
 
 public class Gui extends SimpleGui {
     private final SimpleContainer container;
@@ -28,13 +29,13 @@ public class Gui extends SimpleGui {
 
         this.slot = new FilteringSlot(BlockBoyComponents.ROM, this.container, 0, !arcadeBehaviour.isPlaying());
 
-        this.setSlot(0, new GuiElementBuilder(Items.GRAY_STAINED_GLASS_PANE).hideTooltip());
-        this.setSlot(1, new GuiElementBuilder(Items.GRAY_STAINED_GLASS_PANE).hideTooltip());
-        this.setSlotRedirect(
+        this.setSlot(0, new GuiElementBuilder(Items.STAINED_GLASS_PANE.gray()).hideTooltip());
+        this.setSlot(1, new GuiElementBuilder(Items.STAINED_GLASS_PANE.gray()).hideTooltip());
+        this.setSlot(
                 2,
                 this.slot
         );
-        this.setSlot(3, new GuiElementBuilder(Items.GRAY_STAINED_GLASS_PANE).hideTooltip());
+        this.setSlot(3, new GuiElementBuilder(Items.STAINED_GLASS_PANE.gray()).hideTooltip());
 
         boolean hasValidItem = !arcadeBehaviour.getCartridge().isEmpty() && arcadeBehaviour.getCartridge().has(BlockBoyComponents.ROM);
         boolean canStartStop = arcadeBehaviour.getPlayer() == player;
@@ -50,7 +51,7 @@ public class Gui extends SimpleGui {
     }
 
     private void setOnSlot() {
-        this.setSlot(4, new GuiElementBuilder(Items.GREEN_CONCRETE).setItemName(Component.literal("Turn On")).setCallback(() -> {
+        this.setSlot(4, new GuiElementBuilder(Items.CONCRETE.green()).setItemName(Component.literal("Turn On")).setCallback(() -> {
             ItemStack item = this.getContainer().getItem(0);
             if (item.has(BlockBoyComponents.ROM)) {
                 this.arcadeBehaviour.setCartridge(item);
@@ -61,7 +62,7 @@ public class Gui extends SimpleGui {
     }
 
     private void setOffSlot() {
-        this.setSlot(4, new GuiElementBuilder(Items.RED_CONCRETE).setItemName(Component.literal("Turn Off")).setCallback(() -> {
+        this.setSlot(4, new GuiElementBuilder(Items.CONCRETE.red()).setItemName(Component.literal("Turn Off")).setCallback(() -> {
             this.arcadeBehaviour.clearSession();
             this.slot.setAllowModification(true);
             this.setDefaultSlot();
@@ -70,7 +71,7 @@ public class Gui extends SimpleGui {
     }
 
     private void setDefaultSlot() {
-        this.setSlot(4, new GuiElementBuilder(Items.GRAY_STAINED_GLASS_PANE).hideTooltip());
+        this.setSlot(4, new GuiElementBuilder(Items.STAINED_GLASS_PANE.gray()).hideTooltip());
     }
 
     @Override
@@ -86,7 +87,7 @@ public class Gui extends SimpleGui {
     }
 
     @Override
-    public void onClose() {
+    public void onRemoved() {
         this.player.getInventory().placeItemBackInInventory(this.player.containerMenu.getCarried());
         this.player.containerMenu.setCarried(ItemStack.EMPTY);
 
@@ -135,17 +136,17 @@ public class Gui extends SimpleGui {
         }
 
         @Override
-        public boolean mayPlace(ItemStack stack) {
+        public boolean mayPlace(@NonNull ItemStack stack) {
             return this.allowModification && stack.has(this.componentType);
         }
 
         @Override
-        public boolean mayPickup(Player player) {
+        public boolean mayPickup(@NonNull Player player) {
             return this.allowModification;
         }
 
         @Override
-        public boolean allowModification(Player player) {
+        public boolean allowModification(@NonNull Player player) {
             return this.allowModification;
         }
 

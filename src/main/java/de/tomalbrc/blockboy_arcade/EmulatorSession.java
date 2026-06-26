@@ -2,8 +2,8 @@ package de.tomalbrc.blockboy_arcade;
 
 import de.tomalbrc.blockboy_arcade.config.ModConfig;
 import de.tomalbrc.filament.decoration.block.entity.DecorationBlockEntity;
+import eu.pb4.polymer.virtualentity.api.data.DisplayEntityData;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
-import eu.pb4.polymer.virtualentity.api.tracker.DisplayTrackedData;
 import eu.rekawek.coffeegb_mc.CartridgeOptions;
 import eu.rekawek.coffeegb_mc.controller.ButtonListener;
 import eu.rekawek.coffeegb_mc.emulator.BlockBoyDisplay;
@@ -65,7 +65,7 @@ public class EmulatorSession {
     public void tick() {
         this.onPlayerInput(player.getLastClientInput());
         this.draw();
-        this.screenElement.getDataTracker().setDirty(DisplayTrackedData.Item.ITEM, true);
+        this.screenElement.getSyncedData().setDirty(DisplayEntityData.Item.ITEM, true);
         this.screenElement.getHolder().tick();
 
         Level level = this.blockEntity.getLevel();
@@ -95,7 +95,7 @@ public class EmulatorSession {
                 cmd.colors().set(i, darkenedRgb);
             }
             this.screenDataItem.set(DataComponents.CUSTOM_MODEL_DATA, cmd);
-            this.screenElement.getDataTracker().setDirty(DisplayTrackedData.Item.ITEM, true);
+            this.screenElement.getSyncedData().setDirty(DisplayEntityData.Item.ITEM, true);
             this.screenElement.getHolder().tick();
         }
     }

@@ -12,8 +12,8 @@ import de.tomalbrc.filament.registry.EntityRegistry;
 import de.tomalbrc.filament.util.DecorationUtil;
 import de.tomalbrc.filament.util.FilamentConfig;
 import de.tomalbrc.filament.util.Util;
+import eu.pb4.polymer.virtualentity.api.data.DisplayEntityData;
 import eu.pb4.polymer.virtualentity.api.elements.ItemDisplayElement;
-import eu.pb4.polymer.virtualentity.api.tracker.DisplayTrackedData;
 import eu.rekawek.coffeegb_mc.emulator.EmulationController;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.Identifier;
@@ -144,7 +144,7 @@ public class ArcadeBehaviour implements DecorationBehaviour<ArcadeBehaviour.Conf
         if (this.cartridge != containerItem) {
             if (!this.cartridge.isEmpty() || containerItem.isEmpty()) {
                 this.screen.set(DataComponents.CUSTOM_MODEL_DATA, CustomModelData.EMPTY);
-                this.screenElement.getDataTracker().setDirty(DisplayTrackedData.Item.ITEM, true);
+                this.screenElement.getSyncedData().setDirty(DisplayEntityData.Item.ITEM, true);
                 this.screenElement.getHolder().tick();
             }
             this.cartridge = containerItem;
@@ -194,7 +194,7 @@ public class ArcadeBehaviour implements DecorationBehaviour<ArcadeBehaviour.Conf
         }
 
         if (!this.cartridge.isEmpty()) {
-            Util.spawnAtLocation(decorationBlockEntity.getLevel(), decorationBlockEntity.getBlockPos().getCenter(), this.cartridge);
+            Util.spawnAtLocation(decorationBlockEntity.getLevel(), Vec3.atCenterOf(decorationBlockEntity.getBlockPos()), this.cartridge);
             this.cartridge = ItemStack.EMPTY;
         }
     }
@@ -319,7 +319,7 @@ public class ArcadeBehaviour implements DecorationBehaviour<ArcadeBehaviour.Conf
         @Override
         public void setItem(ItemStack stack) {}
         public void setItemReal(ItemStack stack) {
-            this.dataTracker.set(DisplayTrackedData.Item.ITEM, stack, true);
+            this.syncedData.set(DisplayEntityData.Item.ITEM, stack, true);
         }
     }
 }
