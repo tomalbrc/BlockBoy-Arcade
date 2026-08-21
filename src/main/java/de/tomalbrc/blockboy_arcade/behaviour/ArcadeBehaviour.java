@@ -43,8 +43,8 @@ public class ArcadeBehaviour implements DecorationBehaviour<ArcadeBehaviour.Conf
 
     @NotNull
     final private ScreenItemElement screenElement = new ScreenItemElement();
-    @NotNull
-    private ItemStack screen = Items.PAPER.getDefaultInstance();
+    @Nullable
+    private ItemStack screen;
     @NotNull
     private ItemStack cartridge = ItemStack.EMPTY;
 
@@ -55,12 +55,6 @@ public class ArcadeBehaviour implements DecorationBehaviour<ArcadeBehaviour.Conf
 
     public ArcadeBehaviour(Config config) {
         this.config = config;
-
-        this.screen.set(DataComponents.ITEM_MODEL, Identifier.fromNamespaceAndPath("blockboy", "screen"));
-        this.screen.set(DataComponents.CUSTOM_MODEL_DATA, CustomModelData.EMPTY);
-        this.screenElement.setViewRange(0.0245f);
-        this.screenElement.setBrightness( new Brightness(config.brightness, config.brightness));
-        this.screenElement.setItemReal(screen);
     }
 
     public void setCartridge(@NotNull ItemStack cartridge) {
@@ -93,6 +87,12 @@ public class ArcadeBehaviour implements DecorationBehaviour<ArcadeBehaviour.Conf
             }
         };
 
+        if (this.screen == null) this.screen = Items.PAPER.getDefaultInstance();
+        this.screen.set(DataComponents.ITEM_MODEL, Identifier.fromNamespaceAndPath("blockboy", "screen"));
+        this.screen.set(DataComponents.CUSTOM_MODEL_DATA, CustomModelData.EMPTY);
+        this.screenElement.setViewRange(0.0245f);
+        this.screenElement.setBrightness( new Brightness(config.brightness, config.brightness));
+        this.screenElement.setItemReal(screen);
         holder.addElement(this.screenElement);
 
         DecorationUtil.setupElements(holder, this.blockEntity.getDecorationData(), this.blockEntity.getDirection(), blockEntity.getVisualRotationYInDegrees(), this.blockEntity.visualItemStack(this.blockEntity.getBlockState()), blockEntity::interact);

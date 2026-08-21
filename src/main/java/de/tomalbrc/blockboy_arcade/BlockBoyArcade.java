@@ -5,6 +5,7 @@ import de.tomalbrc.blockboy_arcade.behaviour.BlockBoyBehaviours;
 import de.tomalbrc.blockboy_arcade.command.BlockBoyCommand;
 import de.tomalbrc.blockboy_arcade.component.BlockBoyComponents;
 import de.tomalbrc.blockboy_arcade.util.Assets;
+import de.tomalbrc.filament.api.FilamentLoader;
 import de.tomalbrc.filament.util.FilamentReloadUtil;
 import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
