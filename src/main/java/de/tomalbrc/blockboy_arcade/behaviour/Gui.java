@@ -7,6 +7,7 @@ import eu.pb4.sgui.api.gui.SimpleGui;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Prediction;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Player;
@@ -88,14 +89,14 @@ public class Gui extends SimpleGui {
 
     @Override
     public void onRemoved() {
-        this.player.getInventory().placeItemBackInInventory(this.player.containerMenu.getCarried());
+        this.player.getInventory().placeItemBackInInventory(this.player.containerMenu.getCarried(), Prediction.SERVER_ONLY);
         this.player.containerMenu.setCarried(ItemStack.EMPTY);
 
         var cart = arcadeBehaviour.getCartridge();
 
         for (int i = 0; i < this.container.getContainerSize() - 1; i++) {
             if (!this.container.getItem(i).isEmpty())
-                this.player.getInventory().placeItemBackInInventory(this.container.removeItemNoUpdate(i));
+                this.player.getInventory().placeItemBackInInventory(this.container.removeItemNoUpdate(i), Prediction.SERVER_ONLY);
         }
 
         this.arcadeBehaviour.onGuiClosed(this.container.getItem(0));
