@@ -37,7 +37,7 @@ Make sure the rom file names are lowercase and only contain letters from `a` to 
 
 To add your own arcade model item + block use the filament mod and the `blockboy:arcade` behaviour for decorations.
 
-Arcade example for filament (data/<namespace>/filament/decoration/<name>.json):
+Arcade example for filament (`data/<namespace>/filament/decoration/<name>.json`):
 ```json
 {
   "id": "blockboy:arcade",
@@ -77,7 +77,7 @@ Arcade example for filament (data/<namespace>/filament/decoration/<name>.json):
 }
 ```
 
-Cartridge / rom item example for filament (data/<namespace>/filament/item/<name>.json):
+Cartridge / rom item example for filament (`data/<namespace>/filament/item/<name>.json`):
 ```json
 {
   "id": "blockboy:flooder",
